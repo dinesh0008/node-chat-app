@@ -27,8 +27,8 @@ io.on('connect',(socket)=>{
     users.removeUser(socket.id);
     users.addUser(socket.id,params.name,params.room);
     io.to(params.room).emit('updateUserList',users.getUserList(params.room));
-    socket.emit('newMessage',generateMessage('Dinesh','Welcome to the Crush App'));
-    socket.broadcast.to(params.room).emit('newMessage',generateMessage('Dinesh',`${params.name} has joined`));
+    socket.emit('newMessage',generateMessage('Crush','Welcome to the Crush App'));
+    socket.broadcast.to(params.room).emit('newMessage',generateMessage('Crush',`${params.name} has joined`));
     callback();
   });
   socket.on('createMessage',(message,callback)=>{

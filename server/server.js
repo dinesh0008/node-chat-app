@@ -12,9 +12,9 @@ var io = socketIO(server);
 
 io.on('connect',(socket)=>{
   console.log(`New Client Connected ${socket.id}`);
-  socket.emit('newMessage',generateMessage('Admin','Welcome to the chat app'));
+  socket.emit('newMessage',generateMessage('Dinesh','Welcome to the chat app'));
 
-  socket.broadcast.emit('newMessage',generateMessage('Admin','New User joined'));
+  socket.broadcast.emit('newMessage',generateMessage('Dinesh','New User joined'));
   socket.on('createMessage',(message,callback)=>{
     console.log('createMessage',message);
     io.emit('newMessage',generateMessage(message.from,message.text));

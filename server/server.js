@@ -11,13 +11,13 @@ var io = socketIO(server);
 
 io.on('connect',(socket)=>{
   console.log(`New Client Connected`);
-  socket.emit('newMessage',{
-    from:'server@gmail.com',
-    text:'Hii Dinesh',
-    timeStamp:new Date()
-  });
   socket.on('createMessage',(message)=>{
     console.log('createMessage',message);
+    io.emit('newMessage',{
+      from:message.from,
+      text:message.text,
+      timeStamp:new Date()
+    });
   });
   socket.on('disconnect',()=>{
     console.log('Client Disconnected');

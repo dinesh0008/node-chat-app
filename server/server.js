@@ -2,19 +2,35 @@ const path = require('path');
 const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
+const {isRealString} = require('./utils/validation');
+const {Users} = require('./utils/users');
 const {generateMessage,generateLocationMessage} = require('./utils/message');
 
 const publicPath = path.join(__dirname,'../public');
 const port = process.env.PORT || 3000;
+var users = new Users();
 var app = express();
 var server = http.createServer(app);
 var io = socketIO(server);
 
 io.on('connect',(socket)=>{
   console.log(`New Client Connected ${socket.id}`);
-  socket.emit('newMessage',generateMessage('Dinesh','Welcome to the Crush App'));
 
-  socket.broadcast.emit('newMessage',generateMessage('Dinesh','New User joined'));
+
+  socket.on('join',(params,callback)=>{
+    //console.log(params);
+    //console.log(isRealString(params.name),isRealString(params.room));
+    if(!isRealString(params.name) || !isRealString(params.room)){
+      return callback('Name and tab required');
+    }
+    socket.join(params.room);
+    users.removeUser(socket.id);
+    users.addUser(socket.id,params.name,params.room);
+    io.to(params.room).emit('updateUserList',users.getUserList(params.room));
+    socket.emit('newMessage',generateMessage('Dinesh','Welcome to the Crush App'));
+    socket.broadcast.to(params.room).emit('newMessage',generateMessage('Dinesh',`${params.name} has joined`));
+    callback();
+  });
   socket.on('createMessage',(message,callback)=>{
     console.log('createMessage',message);
     io.emit('newMessage',generateMessage(message.from,message.text));
@@ -25,6 +41,11 @@ io.on('connect',(socket)=>{
   });
   socket.on('disconnect',()=>{
     console.log('Client Disconnected');
+    var user = users.removeUser(socket.id);
+    if(user){
+      io.to(user.room).emit('updateUserList',users.getUserList(user.room));
+      io.to(user.room).emit('newMessage',generateMessage('Dinesh',`${user.name} has left`));
+    }
   });
 });
 

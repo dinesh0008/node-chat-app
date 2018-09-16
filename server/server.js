@@ -40,8 +40,11 @@ io.on('connect',(socket)=>{
     callback();
   });
   socket.on('createLocationMessage',(coords)=>{
+
     var user = users.getUser(socket.id);
-    if(user && isRealString(user)){
+
+    if(user && isRealString(user.name)){
+      console.log('gh');
       io.to(user.room).emit('newLocationMessage',generateLocationMessage(user.name,coords.latitude,coords.longitude));
     }
 

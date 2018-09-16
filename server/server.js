@@ -10,7 +10,18 @@ var server = http.createServer(app);
 var io = socketIO(server);
 
 io.on('connect',(socket)=>{
-  console.log(`New Client Connected`);
+  console.log(`New Client Connected ${socket.id}`);
+  socket.emit('newMessage',{
+    from:'Admin',
+    text:'Welcome to the chat app',
+    timeStamp:new Date()
+  });
+
+  socket.broadcast.emit('newMessage',{
+    from:'Admin',
+    text:'New user joined',
+    timeStamp:new Date()
+  });
   socket.on('createMessage',(message)=>{
     console.log('createMessage',message);
     io.emit('newMessage',{

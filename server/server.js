@@ -10,9 +10,17 @@ var server = http.createServer(app);
 var io = socketIO(server);
 
 io.on('connect',(socket)=>{
-  console.log(`New Client Connected ${socket}`);
+  console.log(`New Client Connected`);
+  socket.emit('newMessage',{
+    from:'server@gmail.com',
+    text:'Hii Dinesh',
+    timeStamp:new Date()
+  });
+  socket.on('createMessage',(message)=>{
+    console.log('createMessage',message);
+  });
   socket.on('disconnect',()=>{
-    console.log('User Disconnected');
+    console.log('Client Disconnected');
   });
 });
 
